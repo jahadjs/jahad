@@ -1,15 +1,99 @@
-import Fastify from "fastify"
+import Fastify from 'fastify'
+import LoadOrderBuilder from "./load-order-builder";
+import {
+    createModuleMap
+} from './utils'
+import Logger from "./logger";
 
-const fastify = Fastify()
+export interface IModule {
+    identifier: string
+    dependsOn?: string[]
+    server?: (fastify: ReturnType<typeof createReagentContext>['fastify']) => void | Promise<void>
+}
 
-fastify.get("/", async (request, reply) => {
-    return { hello: "world" }
-})
+export type ModuleList = IModule[]
 
-fastify.listen({ port: 3000 }, (err, address) => {
-    if (err) {
-        console.error(err)
-        process.exit(1)
+export const buildLoadOrder = (modules: ModuleList) => {
+    // using helper to build load order
+    const loadOrderBuilder = new LoadOrderBuilder(modules)
+
+    // get ready load order
+    return loadOrderBuilder.buildLoadOrder()
+}
+
+class ReagentContext {
+    constructor(private readonly fastify: ReturnType<typeof Fastify>) {
     }
-    console.log(`Server listening at ${address}`)
-})
+
+    getServerInstance() {
+        return this.fastify
+    }
+}
+
+class ModuleLoader {
+    constructor(
+        private readonly context: ReagentContext,
+        private readonly module: IModule
+    ) {
+    }
+
+    async applyServerExtension() {
+        const {
+            server
+        } = this.module
+
+        if (server) {
+            await server(this.context.getServerInstance())
+        }
+    }
+
+    async loadModule() {
+        await this.applyServerExtension()
+    }
+}
+
+// Creating context of Reagent App
+// Currently, it should contain instance of fastify so that
+// Modules are able to register new routes
+export const createReagentContext = () => {
+    const fastify = Fastify()
+    const context = new ReagentContext(
+        fastify
+    )
+
+    return context
+}
+
+export const Reagent = async ({
+                                           modules,
+                                       }: {
+    modules: ModuleList
+}) => {
+    // the same thing is being created inside of LoadOrderBuilder
+    // so it has to be deduped
+    const moduleMap = createModuleMap(modules)
+    // initialize app context
+    const context = createReagentContext()
+
+    // build load order of modules
+    const loadOrder = buildLoadOrder(modules)
+
+    // go through load order and load modules
+    // in given sequence
+    for (const identifier of loadOrder) {
+        const moduleLoader = new ModuleLoader(
+            context,
+            moduleMap[identifier]
+        )
+
+        await moduleLoader.loadModule()
+    }
+
+    // once all modules have been loaded
+    // let's start application
+    context.getServerInstance().listen({
+        port: 3000
+    }, () => {
+        Logger.info('server started')
+    })
+}
