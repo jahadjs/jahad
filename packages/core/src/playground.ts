@@ -1,16 +1,32 @@
-import {IModule, Reagent} from "./index";
+import {Injectable} from "./decorators"
+import {Inject} from "./dependency-helpers"
 
-const module: IModule = {
-    identifier: 'main',
-    server: (fastify) => {
-        fastify.get('/', () => {
-            return {hello: 'world'}
-        })
+@Injectable({
+    namespace: 'Core/Handler'
+})
+class InjectableTest {
+    private readonly second: Second
+
+    constructor() {
+        this.second = Inject({
+            namespace: 'Other/Module'
+        }) as Second
+    }
+
+    hello() {
+        return this.second.world()
     }
 }
 
-Reagent({
-    modules: [
-        module
-    ]
+@Injectable({
+    namespace: 'Other/Module'
 })
+class Second {
+    world() {
+        return 'second'
+    }
+}
+
+const testInstance = Inject({namespace: 'Core/Handler'}) as InjectableTest
+
+console.log(testInstance.hello())

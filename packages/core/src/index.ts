@@ -65,8 +65,8 @@ export const createReagentContext = () => {
 }
 
 export const Reagent = async ({
-                                           modules,
-                                       }: {
+                                  modules,
+                              }: {
     modules: ModuleList
 }) => {
     // the same thing is being created inside of LoadOrderBuilder
@@ -97,3 +97,5 @@ export const Reagent = async ({
         Logger.info('server started')
     })
 }
+
+export default Reagent
