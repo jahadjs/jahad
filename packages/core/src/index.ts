@@ -4,7 +4,8 @@ import {
     createModuleMap
 } from './utils'
 import Logger from "./logger";
-import DependencyContainer from "./dependency-container";
+import ModuleLoader from './module-loader';
+import ReagentContext from './reagent-context';
 
 export interface IModule {
     identifier: string
@@ -21,70 +22,6 @@ export const buildLoadOrder = (modules: ModuleList) => {
 
     // get ready load order
     return loadOrderBuilder.buildLoadOrder()
-}
-
-class ReagentContext {
-    constructor(private readonly fastify: ReturnType<typeof Fastify>) {
-    }
-
-    getServerInstance() {
-        return this.fastify
-    }
-}
-
-class ModuleLoader {
-    constructor(
-        private readonly context: ReagentContext,
-        private readonly module: IModule
-    ) {
-    }
-
-    async applyServerExtension() {
-        const {
-            server
-        } = this.module
-
-        if (server) {
-            await server(this.context.getServerInstance())
-        }
-    }
-
-    async registerInjectables() {
-        const {
-            injectables
-        } = this.module
-
-        if (!injectables || !injectables.length) {
-            return
-        }
-
-        let len = injectables.length
-        let index = 0
-
-        while (index < len) {
-            const target = injectables[index]
-            const injectableOptions = Reflect.get(
-                target,
-                'injectableOptions'
-            ) as { namespace: string }
-
-            const {
-                namespace
-            } = injectableOptions
-
-            DependencyContainer.addInjectable(
-                namespace,
-                target
-            )
-
-            index++
-        }
-    }
-
-    async loadModule() {
-        await this.registerInjectables()
-        await this.applyServerExtension()
-    }
 }
 
 // Creating context of Reagent App
