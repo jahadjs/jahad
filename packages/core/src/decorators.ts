@@ -1,14 +1,11 @@
-import DependencyContainer from "./dependency-container";
-
-export function Injectable({
-    namespace
-}: {
+export function Injectable(options: {
     namespace: string
 }) {
     return function (target: Function) {
-        DependencyContainer.addInjectable(
-            namespace,
-            target as { new(): unknown }
-            )
+        Reflect.set(
+            target,
+            'injectableOptions',
+            options
+        )
     }
 }

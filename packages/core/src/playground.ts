@@ -1,32 +1,27 @@
-import {Injectable} from "./decorators"
-import {Inject} from "./dependency-helpers"
+import Reagent from "./index";
+import {Injectable} from "./decorators";
+import {Inject} from "./dependency-helpers";
 
 @Injectable({
-    namespace: 'Core/Handler'
+    namespace: 'Test'
 })
-class InjectableTest {
-    private readonly second: Second
-
-    constructor() {
-        this.second = Inject({
-            namespace: 'Other/Module'
-        }) as Second
-    }
-
+class Test {
     hello() {
-        return this.second.world()
+        console.log('world')
     }
 }
 
-@Injectable({
-    namespace: 'Other/Module'
+const app = Reagent({
+    modules: [
+        {
+            identifier: 'module-one',
+            injectables: [
+                Test
+            ]
+        }
+    ]
 })
-class Second {
-    world() {
-        return 'second'
-    }
-}
 
-const testInstance = Inject({namespace: 'Core/Handler'}) as InjectableTest
+const test = Inject({ namespace: 'Test' }) as Test
 
-console.log(testInstance.hello())
+test.hello()

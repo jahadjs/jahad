@@ -4,11 +4,13 @@ import {
     createModuleMap
 } from './utils'
 import Logger from "./logger";
+import DependencyContainer from "./dependency-container";
 
 export interface IModule {
     identifier: string
     dependsOn?: string[]
     server?: (fastify: ReturnType<typeof createReagentContext>['fastify']) => void | Promise<void>
+    injectables?: { new(): any }[]
 }
 
 export type ModuleList = IModule[]
@@ -47,7 +49,40 @@ class ModuleLoader {
         }
     }
 
+    async registerInjectables() {
+        const {
+            injectables
+        } = this.module
+
+        if (!injectables || !injectables.length) {
+            return
+        }
+
+        let len = injectables.length
+        let index = 0
+
+        while (index < len) {
+            const target = injectables[index]
+            const injectableOptions = Reflect.get(
+                target,
+                'injectableOptions'
+            ) as { namespace: string }
+
+            const {
+                namespace
+            } = injectableOptions
+
+            DependencyContainer.addInjectable(
+                namespace,
+                target
+            )
+
+            index++
+        }
+    }
+
     async loadModule() {
+        await this.registerInjectables()
         await this.applyServerExtension()
     }
 }
