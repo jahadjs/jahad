@@ -1,16 +1,14 @@
 {
-  "name": "@reagent/core",
+  "name": "@mr0bread/viole-core",
   "version": "0.0.1",
   "license": "MIT",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "vite-node src/index.ts",
-    "play": "vite-node src/playground.ts",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "build": "vite build",
-    "esbuild:build": "esbuild src/index.ts --bundle --outfile=dist/main.js --platform=node --external:./node_modules/* --target=node16",
-    "ts:check": "yarn tsc --noEmit"
+    "ts:build": "yarn tsc --p tsconfig.build.json",
+    "ts:types": "yarn tsc --p tsconfig.types.json",
+    "build": "yarn ts:build && yarn ts:types"
   },
   "dependencies": {
     "chalk": "5.1.2",
@@ -19,7 +17,6 @@
   "devDependencies": {
     "@types/node": "18.11.0",
     "typescript": "4.8.4",
-    "vite": "3.1.8",
     "vite-node": "0.24.3",
     "vitest": "0.24.3"
   }
