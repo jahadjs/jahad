@@ -1,9 +1,9 @@
 import chalk from "chalk"
 class Logger {
     private readonly log = console.log
-    info(message: string) {
+    info(...text: unknown[]) {
         this.log(
-            chalk.green(message)
+            chalk.green(text)
         )
     }
 }

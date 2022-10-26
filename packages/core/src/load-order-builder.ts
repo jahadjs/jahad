@@ -1,4 +1,4 @@
-import {IModule, ModuleList } from "."
+import { IModule, ModuleList } from "./types"
 import { createModuleMap } from "./utils"
 
 export default class LoadOrderBuilder {

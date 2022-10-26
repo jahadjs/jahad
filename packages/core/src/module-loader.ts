@@ -1,12 +1,12 @@
-import { IModule } from "."
 import ReagentContext from "./reagent-context"
 import DependencyContainer from "./dependency-container";
+import {IModule} from "./types";
 
 export default class ModuleLoader {
     constructor(
         private readonly context: ReagentContext,
         private readonly module: IModule
-        ) {
+    ) {
     }
 
     async applyServerExtension() {
@@ -36,7 +36,7 @@ export default class ModuleLoader {
             const injectableOptions = Reflect.get(
                 target,
                 'injectableOptions'
-                ) as { namespace: string }
+            ) as { namespace: string }
 
             const {
                 namespace
@@ -45,7 +45,7 @@ export default class ModuleLoader {
             DependencyContainer.addInjectable(
                 namespace,
                 target
-                )
+            )
 
             index++
         }

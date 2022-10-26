@@ -6,15 +6,7 @@ import {
 import Logger from "./logger";
 import ModuleLoader from './module-loader';
 import ReagentContext from './reagent-context';
-
-export interface IModule {
-    identifier: string
-    dependsOn?: string[]
-    server?: (fastify: ReturnType<typeof createReagentContext>['fastify']) => void | Promise<void>
-    injectables?: { new(): any }[]
-}
-
-export type ModuleList = IModule[]
+import { ModuleList } from './types';
 
 export const buildLoadOrder = (modules: ModuleList) => {
     // using helper to build load order
@@ -53,12 +45,21 @@ export const Reagent = async ({
     // go through load order and load modules
     // in given sequence
     for (const identifier of loadOrder) {
+        const module = moduleMap[identifier]
         const moduleLoader = new ModuleLoader(
             context,
-            moduleMap[identifier]
+            module
         )
 
+        const start = process.hrtime()
+
         await moduleLoader.loadModule()
+
+        const [, nanoseconds] = process.hrtime(start)
+
+        const loadingTime = nanoseconds / 1000000
+
+        Logger.info(`Loaded ${module.identifier} in ${ loadingTime }ms`)
     }
 
     // once all modules have been loaded
