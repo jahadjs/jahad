@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import Fastify from 'fastify'
 import LoadOrderBuilder from "./load-order-builder";
 import {
@@ -6,7 +7,8 @@ import {
 import Logger from "./logger";
 import ModuleLoader from './module-loader';
 import ReagentContext from './reagent-context';
-import { ModuleList } from './types';
+import {Config, ModuleList} from './types';
+import {DataSource} from "typeorm";
 
 export const buildLoadOrder = (modules: ModuleList) => {
     // using helper to build load order
@@ -30,9 +32,12 @@ export const createReagentContext = () => {
 
 export const Reagent = async ({
                                   modules,
+                                  config
                               }: {
-    modules: ModuleList
+    modules: ModuleList;
+    config: Config
 }) => {
+    const reagentStart = process.hrtime()
     // the same thing is being created inside of LoadOrderBuilder
     // so it has to be deduped
     const moduleMap = createModuleMap(modules)
@@ -42,32 +47,45 @@ export const Reagent = async ({
     // build load order of modules
     const loadOrder = buildLoadOrder(modules)
 
-    // go through load order and load modules
-    // in given sequence
-    for (const identifier of loadOrder) {
-        const module = moduleMap[identifier]
-        const moduleLoader = new ModuleLoader(
-            context,
-            module
+    const moduleLoader = new ModuleLoader(
+        loadOrder,
+        context,
+        moduleMap
+    )
+
+    await moduleLoader.loadModules()
+
+    // once modules are loaded
+    // it's time to create db connection
+    const {
+        db
+    } = config
+    const dataSourceOptions = context.dataSourceManager.getOptions()
+    const dataSource = new DataSource({
+        ...db,
+        ...dataSourceOptions
+    })
+
+    try {
+        await dataSource.initialize()
+
+        Logger.info(
+            'Successfully connected to DB'
         )
+    } catch (e) {
+        Logger.error('Could not connect to db. Error is following', e)
 
-        const start = process.hrtime()
-
-        await moduleLoader.loadModule()
-
-        const [, nanoseconds] = process.hrtime(start)
-
-        const loadingTime = nanoseconds / 1000000
-
-        Logger.info(`Loaded ${module.identifier} in ${ loadingTime }ms`)
+        return
     }
 
-    // once all modules have been loaded
     // let's start application
     context.getServerInstance().listen({
         port: 3000
     }, () => {
-        Logger.info('server started')
+        const [_, nanoseconds] = process.hrtime(reagentStart)
+        const startupTime = nanoseconds / 1000000
+
+        Logger.info(`Viole started in ${ startupTime }ms. Listening on port 3000`)
     })
 }
 

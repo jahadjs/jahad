@@ -6,6 +6,12 @@ class Logger {
             chalk.green(text)
         )
     }
+
+    error(...text: unknown[]) {
+        this.log(
+            chalk.red(text)
+        )
+    }
 }
 
 export default new Logger()
