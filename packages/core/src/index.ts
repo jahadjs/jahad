@@ -9,6 +9,9 @@ import ModuleLoader from './module-loader';
 import ReagentContext from './reagent-context';
 import {Config, ModuleList} from './types';
 import {DataSource} from "typeorm";
+import DependencyContainer from "./dependency-container";
+import {DbConnection} from "./db-connection";
+import {Inject} from "./dependency-helpers";
 
 export const buildLoadOrder = (modules: ModuleList) => {
     // using helper to build load order
@@ -69,6 +72,17 @@ export const Reagent = async ({
     try {
         await dataSource.initialize()
 
+        // registerin DbConnection as injectable
+        DependencyContainer.addInjectable(
+            'connection',
+            DbConnection
+        )
+
+        // Injecting connection and setting dataSource
+        const connection = Inject({ namespace: 'connection' }) as DbConnection
+
+        connection.setConnection(dataSource)
+
         Logger.info(
             'Successfully connected to DB'
         )
@@ -87,6 +101,10 @@ export const Reagent = async ({
 
         Logger.info(`Viole started in ${ startupTime }ms. Listening on port 3000`)
     })
+}
+
+export {
+    Inject
 }
 
 export default Reagent
