@@ -1,0 +1,34 @@
+{
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/nx-cloud",
+      "options": {
+        "cacheableOperations": [
+          "test",
+          "ts:build",
+          "ts:types",
+          "build"
+        ],
+        "accessToken": "ZDE4ZWU2MWQtYmVmNS00MjgzLTkyOGItODk0YmQyMTA1ZjBmfHJlYWQtd3JpdGU="
+      }
+    }
+  },
+  "targetDefaults": {
+    "ts:build": {
+      "outputs": [
+        "{projectRoot}/packages/core/dist"
+      ]
+    },
+    "ts:types": {
+      "outputs": [
+        "{projectRoot}/packages/core/dist/types"
+      ]
+    },
+    "build": {
+      "outputs": [
+        "{projectRoot}/packages/core/dist"
+      ]
+    }
+  },
+  "defaultBase": "master"
+}
