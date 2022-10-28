@@ -1,12 +1,14 @@
 import path from "path";
-import * as fs from "fs";
+import fs from "fs-extra";
 import logger from "src/logger.js";
 import {PackageManager} from "src/get-user-package-manager.js";
+import {execaCommand} from "execa";
+import ora from "ora";
 
 const createProject = async ({
-    projectName,
-    packageManager
-}: {
+                                 projectName,
+                                 packageManager
+                             }: {
     projectName: string,
     packageManager: PackageManager
 }) => {
@@ -14,7 +16,7 @@ const createProject = async ({
 
     // check if folder exists
     if (fs.existsSync(projectPath)) {
-        logger.error(`Directory already exists: ${ projectName }`)
+        logger.error(`Directory already exists: ${projectName}`)
 
         throw new Error()
     }
@@ -22,11 +24,41 @@ const createProject = async ({
     // create project directory
     await fs.promises.mkdir(projectPath)
 
-    // download template into project directory
-
     // create package.json
+    const packageJson = {
+        name: projectName,
+        version: '0.1.0',
+        private: true
+    }
+
+    fs.writeJSONSync(
+        path.join(
+            projectPath,
+            'package.json'
+        ),
+        packageJson,
+        {
+            spaces: 2
+        }
+    )
 
     // install dependencies
+    const dependencies = [
+        '@mr0bread/viole-core'
+    ]
+
+    const isYarn = packageManager === 'yarn'
+
+    const spinner = ora('Installing dependencies').start()
+
+    await execaCommand(
+        `${packageManager} ${isYarn ? 'add' : 'install'} ${dependencies.join(' ')}`,
+        {
+            cwd: projectPath
+        }
+    )
+
+    spinner.succeed()
 }
 
 export default createProject
