@@ -2,3 +2,4 @@ node_modules
 dist
 playground/
 .yarn
+packages/create-jahad-app/templates
