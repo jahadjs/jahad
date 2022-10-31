@@ -1,62 +1,77 @@
-import {Command} from "commander";
+import { Command } from "commander";
 import inquirer from "inquirer";
-import logger from "src/logger.js";
 
 const setDescription = (program: Command) => {
-    program
-        .description(
-            'CLI for creating Jahad Project applications'
-        )
+  program.description("CLI for creating Jahad Project applications");
 
-    return program
-}
+  return program;
+};
 
 const setArguments = (program: Command) => {
-    program
-        .argument(
-            '[dir]',
-            'Both name of app and name of directory project will be created in'
-        )
+  program.argument(
+    "[dir]",
+    "Both name of app and name of directory project will be created in"
+  );
 
-    return program
-}
+  return program;
+};
 
 const promptAppDir = async () => {
-    const {
-        appDir
-    } = await inquirer.prompt<string>({
-        name: 'appDir',
-        type: 'input',
-        message: 'Please, specify your project name',
-        default: 'my-jahad',
-        transformer: (input: string) => {
-            return input.trim();
-        },
-    })
+  const { appDir } = await inquirer.prompt<{ appDir: string }>({
+    name: "appDir",
+    type: "input",
+    message: "Please, specify your project name",
+    default: "my-jahad",
+    transformer: (input: string) => {
+      return input.trim();
+    },
+  });
 
-    return appDir
-}
+  return appDir;
+};
+
+const promptDepsInstall = async () => {
+  const { isInstall } = await inquirer.prompt<{ isInstall: boolean }>({
+    name: "isInstall",
+    type: "confirm",
+    message: "Do you want us to install dependencies",
+    default: true,
+  });
+
+  return isInstall;
+};
+
+const setOptions = (program: Command) => {
+  program.option("--no-install", "Disable dependencies installation");
+};
 
 const runCli = async () => {
-    const cliResults: {
-        appDir: string
-    } = {}
-    const program = new Command('create-jahad-app')
+  const cliResults: {
+    appDir: string;
+    isInstall: boolean;
+  } = {
+    appDir: "",
+    isInstall: true,
+  };
+  const program = new Command("create-jahad-app");
 
-    setDescription(program)
-    setArguments(program)
+  setDescription(program);
+  setArguments(program);
+  setOptions(program);
 
-    program.parse(process.argv)
+  program.parse(process.argv);
 
-    const appDir = program.args[0]
+  const appDir = program.args[0];
 
-    if (appDir) {
-        cliResults.appDir = appDir
-    } else {
-        cliResults.appDir = await promptAppDir()
-    }
+  if (appDir) {
+    cliResults.appDir = appDir;
+  } else {
+    cliResults.appDir = await promptAppDir();
+  }
 
-    return cliResults
-}
+  cliResults.isInstall = await promptDepsInstall();
 
-export default runCli
+  return cliResults;
+};
+
+export default runCli;

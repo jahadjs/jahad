@@ -7,6 +7,9 @@
   "workspaces": [
     "packages/**"
   ],
+  "scripts": {
+      "cja:build": "nx run create-jahad-app:build"
+  },
   "private": true,
   "devDependencies": {
     "@nrwl/nx-cloud": "latest",
