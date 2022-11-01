@@ -1,4 +1,4 @@
-import {DataSource} from "typeorm";
+import { DataSource } from "typeorm"
 
 export class DbConnection {
     private dataSource?: DataSource

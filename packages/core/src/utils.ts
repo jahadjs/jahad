@@ -1,7 +1,7 @@
-import {IModule, ModuleList} from "./types"
+import { IModule, ModuleList } from "./types"
 
-export const createModuleMap = (modules: ModuleList) => modules
-    .reduce((acc, curr) => {
+export const createModuleMap = (modules: ModuleList) =>
+    modules.reduce((acc, curr) => {
         return {
             ...acc,
             [curr.identifier]: curr

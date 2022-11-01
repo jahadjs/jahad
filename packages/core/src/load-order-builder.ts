@@ -11,24 +11,21 @@ export default class LoadOrderBuilder {
     }
 
     buildLoadOrder() {
-        const independentModules = this.modules
-        .filter(({dependsOn}) => !dependsOn || !dependsOn.length)
-        let dependentModules = this.modules
-        .filter(({dependsOn}) => dependsOn && dependsOn.length)
+        const independentModules = this.modules.filter(
+            ({ dependsOn }) => !dependsOn || !dependsOn.length
+        )
+        let dependentModules = this.modules.filter(
+            ({ dependsOn }) => dependsOn && dependsOn.length
+        )
 
-        this.loadOrder = independentModules.map(({identifier}) => identifier);
+        this.loadOrder = independentModules.map(({ identifier }) => identifier)
 
-        const queue = dependentModules.length ?
-        [dependentModules.shift()]
-        : []
+        const queue = dependentModules.length ? [dependentModules.shift()] : []
 
         outer: while (queue.length) {
             const current = queue.shift() as IModule
 
-            const {
-                dependsOn = [],
-                identifier
-            } = current
+            const { dependsOn = [], identifier } = current
 
             for (const dependencyId of dependsOn) {
                 if (!this.has(dependencyId)) {

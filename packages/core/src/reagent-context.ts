@@ -1,5 +1,5 @@
-import type Fastify from "fastify";
-import { DbEntities } from "./types";
+import type Fastify from "fastify"
+import { DbEntities } from "./types"
 
 export class DataSourceManager {
     private dataSourceOptions: {
@@ -22,8 +22,7 @@ export class DataSourceManager {
 
 export default class ReagentContext {
     dataSourceManager = new DataSourceManager()
-    constructor(private readonly fastify: ReturnType<typeof Fastify>) {
-    }
+    constructor(private readonly fastify: ReturnType<typeof Fastify>) {}
 
     getServerInstance() {
         return this.fastify

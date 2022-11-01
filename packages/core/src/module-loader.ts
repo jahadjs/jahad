@@ -1,10 +1,11 @@
 import ReagentContext from "./reagent-context"
-import DependencyContainer from "./dependency-container";
-import {IModule} from "./types";
-import Logger from './logger'
+import DependencyContainer from "./dependency-container"
+import { IModule, PluginMap } from "./types"
+import Logger from "./logger"
 
 export default class ModuleLoader {
     private module: IModule
+    private pluginMap: PluginMap = {}
 
     constructor(
         private readonly loadOrder: string[],
@@ -15,19 +16,72 @@ export default class ModuleLoader {
     }
 
     private async applyServerExtension() {
-        const {
-            server
-        } = this.module
+        const { server } = this.module
 
         if (server) {
             await server(this.context.getServerInstance())
         }
     }
 
+    private getPluginMap() {
+        const { plugins } = this.module
+
+        if (!plugins || !Object.keys(plugins).length) {
+            return {}
+        }
+
+        return plugins.reduce((acc, plugin) => {
+            const { namespace, method, type, handler } = plugin
+
+            // register first plugin for class
+            if (!acc[namespace]) {
+                acc[namespace] = {
+                    [method]: {
+                        [type]: [
+                            {
+                                handler
+                            }
+                        ]
+                    }
+                }
+
+                return acc
+            }
+
+            // register first plugin for method
+            if (!acc[namespace][method]) {
+                acc[namespace][method] = {
+                    [type]: [
+                        {
+                            handler
+                        }
+                    ]
+                }
+
+                return acc
+            }
+
+            // register first plugin of provided type
+            if (!acc[namespace][method][type]) {
+                acc[namespace][method][type] = [
+                    {
+                        handler
+                    }
+                ]
+
+                return acc
+            }
+
+            acc[namespace][method][type].push({
+                handler
+            })
+
+            return acc
+        }, {})
+    }
+
     private async registerInjectables() {
-        const {
-            injectables
-        } = this.module
+        const { injectables } = this.module
 
         if (!injectables || !injectables.length) {
             return
@@ -40,34 +94,27 @@ export default class ModuleLoader {
             const target = injectables[index]
             const injectableOptions = Reflect.get(
                 target,
-                'injectableOptions'
-            ) as { namespace: string }
+                "injectableOptions"
+            ) as {
+                namespace: string
+            }
 
-            const {
-                namespace
-            } = injectableOptions
+            const { namespace } = injectableOptions
 
-            DependencyContainer.addInjectable(
-                namespace,
-                target
-            )
+            DependencyContainer.addInjectable(namespace, target)
 
             index++
         }
     }
 
     private async registerEntities() {
-        const {
-            db
-        } = this.module
+        const { db } = this.module
 
         if (!db) {
             return
         }
 
-        const {
-            entities
-        } = db
+        const { entities } = db
 
         if (!entities || !Object.keys(entities).length) {
             return
@@ -87,6 +134,7 @@ export default class ModuleLoader {
         // in given sequence
         for (const identifier of this.loadOrder) {
             this.module = this.moduleMap[identifier]
+            this.pluginMap = this.getPluginMap()
 
             const start = process.hrtime()
 
@@ -96,7 +144,7 @@ export default class ModuleLoader {
 
             const loadingTime = nanoseconds / 1000000
 
-            Logger.info(`Loaded ${this.module.identifier} in ${ loadingTime }ms`)
+            Logger.info(`Loaded ${this.module.identifier} in ${loadingTime}ms`)
         }
     }
 }

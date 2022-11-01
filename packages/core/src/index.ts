@@ -1,17 +1,15 @@
 import "reflect-metadata"
-import Fastify from 'fastify'
-import LoadOrderBuilder from "./load-order-builder";
-import {
-    createModuleMap
-} from './utils'
-import Logger from "./logger";
-import ModuleLoader from './module-loader';
-import ReagentContext from './reagent-context';
-import {Config, ModuleList} from './types';
-import {DataSource} from "typeorm";
-import DependencyContainer from "./dependency-container";
-import {DbConnection} from "./db-connection";
-import {Inject} from "./dependency-helpers";
+import Fastify from "fastify"
+import LoadOrderBuilder from "./load-order-builder"
+import { createModuleMap } from "./utils"
+import Logger from "./logger"
+import ModuleLoader from "./module-loader"
+import ReagentContext from "./reagent-context"
+import { Config, ModuleList } from "./types"
+import { DataSource } from "typeorm"
+import DependencyContainer from "./dependency-container"
+import { DbConnection } from "./db-connection"
+import { Inject } from "./dependency-helpers"
 
 export const buildLoadOrder = (modules: ModuleList) => {
     // using helper to build load order
@@ -26,18 +24,16 @@ export const buildLoadOrder = (modules: ModuleList) => {
 // Modules are able to register new routes
 export const createReagentContext = () => {
     const fastify = Fastify()
-    const context = new ReagentContext(
-        fastify
-    )
+    const context = new ReagentContext(fastify)
 
     return context
 }
 
 export const Reagent = async ({
-                                  modules,
-                                  config
-                              }: {
-    modules: ModuleList;
+    modules,
+    config
+}: {
+    modules: ModuleList
     config: Config
 }) => {
     const reagentStart = process.hrtime()
@@ -50,19 +46,13 @@ export const Reagent = async ({
     // build load order of modules
     const loadOrder = buildLoadOrder(modules)
 
-    const moduleLoader = new ModuleLoader(
-        loadOrder,
-        context,
-        moduleMap
-    )
+    const moduleLoader = new ModuleLoader(loadOrder, context, moduleMap)
 
     await moduleLoader.loadModules()
 
     // once modules are loaded
     // it's time to create db connection
-    const {
-        db
-    } = config
+    const { db } = config
     const dataSourceOptions = context.dataSourceManager.getOptions()
     const dataSource = new DataSource({
         ...db,
@@ -73,38 +63,36 @@ export const Reagent = async ({
         await dataSource.initialize()
 
         // registerin DbConnection as injectable
-        DependencyContainer.addInjectable(
-            'connection',
-            DbConnection
-        )
+        DependencyContainer.addInjectable("connection", DbConnection)
 
         // Injecting connection and setting dataSource
-        const connection = Inject({ namespace: 'connection' }) as DbConnection
+        const connection = Inject({ namespace: "connection" }) as DbConnection
 
         connection.setConnection(dataSource)
 
-        Logger.info(
-            'Successfully connected to DB'
-        )
+        Logger.info("Successfully connected to DB")
     } catch (e) {
-        Logger.error('Could not connect to db. Error is following', e)
+        Logger.error("Could not connect to db. Error is following", e)
 
         return
     }
 
     // let's start application
-    context.getServerInstance().listen({
-        port: 3000
-    }, () => {
-        const [_, nanoseconds] = process.hrtime(reagentStart)
-        const startupTime = nanoseconds / 1000000
+    context.getServerInstance().listen(
+        {
+            port: 3000
+        },
+        () => {
+            const [_, nanoseconds] = process.hrtime(reagentStart)
+            const startupTime = nanoseconds / 1000000
 
-        Logger.info(`Viole started in ${ startupTime }ms. Listening on port 3000`)
-    })
+            Logger.info(
+                `Viole started in ${startupTime}ms. Listening on port 3000`
+            )
+        }
+    )
 }
 
-export {
-    Inject
-}
+export { Inject }
 
 export default Reagent

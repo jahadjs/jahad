@@ -1,15 +1,12 @@
-import Logger from "./logger";
-import {Class} from "type-fest";
+import Logger from "./logger"
+import { Class } from "type-fest"
 
 export class DependencyContainerClass {
     private depsMap: Record<string, Class<any>> = {}
 
     private depsCache: Record<string, Class<any>> = {}
 
-    addInjectable(
-        namespace: string,
-        target: Class<any>
-    ) {
+    addInjectable(namespace: string, target: Class<any>) {
         this.depsMap = {
             ...this.depsMap,
             [namespace]: target
@@ -17,7 +14,7 @@ export class DependencyContainerClass {
     }
 
     instantiate(namespace: string) {
-        const target = this.depsMap[namespace];
+        const target = this.depsMap[namespace]
 
         if (!target) {
             Logger.info(`Class not found by namespace: ${namespace}`)
