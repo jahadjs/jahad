@@ -9,7 +9,7 @@ export default class ModuleLoader {
 
     constructor(
         private readonly loadOrder: string[],
-        private readonly context: ReagentContext,
+        private context: ReagentContext,
         private readonly moduleMap: Record<string, IModule>
     ) {
         this.module = moduleMap[loadOrder[0]]
@@ -123,28 +123,51 @@ export default class ModuleLoader {
         this.context.dataSourceManager.addEntities(entities)
     }
 
-    private async loadModule() {
-        await this.registerInjectables()
-        await this.registerEntities()
-        await this.applyServerExtension()
+    private async applyContextExtensions() {
+        const {
+            app
+        } = this.module
+
+        if (!app) {
+            return
+        }
+
+        const {
+            context
+        } = app
+
+        if (!context) {
+            return
+        }
+
+        this.context = await context(this.context)
+    }
+
+    private setNextModule(identifier: string) {
+        this.module = this.moduleMap[identifier]
+    }
+
+    private async prebuild() {
+        for (const identifier of this.loadOrder) {
+            this.setNextModule(identifier)
+
+            await this.registerInjectables()
+            await this.applyContextExtensions()
+            await this.registerEntities()
+        }
+    }
+
+    private async build() {
+        for (const identifier of this.loadOrder) {
+            this.setNextModule(identifier)
+
+            await this.applyServerExtension()
+        }
     }
 
     async loadModules() {
-        // go through load order and load modules
-        // in given sequence
-        for (const identifier of this.loadOrder) {
-            this.module = this.moduleMap[identifier]
-            this.pluginMap = this.getPluginMap()
-
-            const start = process.hrtime()
-
-            await this.loadModule()
-
-            const [, nanoseconds] = process.hrtime(start)
-
-            const loadingTime = nanoseconds / 1000000
-
-            Logger.info(`Loaded ${this.module.identifier} in ${loadingTime}ms`)
-        }
+        // perform all steps needed to load and init modules
+        await this.prebuild()
+        await this.build()
     }
 }

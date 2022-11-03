@@ -1,5 +1,7 @@
 import type Fastify from "fastify"
 import { EntitySchema } from "typeorm/entity-schema/EntitySchema"
+import ReagentContext from "./reagent-context";
+import {Promisable} from "type-fest";
 
 // Using map only to ensure
 // than entity from one module
@@ -37,6 +39,9 @@ export interface IModule {
         entities?: DbEntities
     }
     plugins?: Plugin[]
+    app?: {
+        context?: (context: ReagentContext) => Promisable<ReagentContext & Record<string, unknown>>
+    }
 }
 
 export type ModuleList = IModule[]
