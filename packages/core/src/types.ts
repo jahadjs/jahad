@@ -30,6 +30,16 @@ export interface PluginMap {
     }
 }
 
+export interface OnModuleLoadHook {
+    during: 'pre-build' | 'build',
+    handler: (module: IModule, context: ReagentContext) => Promisable<void>
+}
+
+export interface OnModulesLoadedHook {
+    after: 'pre-build' | 'build',
+    handler: (context: ReagentContext) => Promisable<void>
+}
+
 export interface IModule {
     identifier: string
     dependsOn?: string[]
@@ -41,6 +51,10 @@ export interface IModule {
     plugins?: Plugin[]
     app?: {
         context?: (context: ReagentContext) => Promisable<ReagentContext & Record<string, unknown>>
+        loaders?: {
+            onModuleLoad?: OnModuleLoadHook[],
+            onModulesLoaded?: []
+        }
     }
 }
 

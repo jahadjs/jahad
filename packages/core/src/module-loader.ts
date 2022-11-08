@@ -3,6 +3,8 @@ import DependencyContainer from "./dependency-container"
 import { IModule, PluginMap } from "./types"
 import Logger from "./logger"
 
+
+
 export default class ModuleLoader {
     private module: IModule
     private pluginMap: PluginMap = {}
@@ -165,7 +167,39 @@ export default class ModuleLoader {
         }
     }
 
+    private async registerLoaders() {
+        for (const identifier of this.loadOrder) {
+            const {
+                app
+            } = this.moduleMap[identifier]
+
+            if (!app) {
+                return
+            }
+
+            const { loaders } = app
+
+            if (!loaders || !Object.keys(loaders).length) {
+                return;
+            }
+
+            const {
+                onModuleLoad,
+                onModulesLoaded
+            } = loaders;
+
+            if (onModuleLoad && onModuleLoad.length) {
+                // register loaders that are called after each module load
+            }
+
+            if (onModulesLoaded && onModulesLoaded.length) {
+                // register loaders that are called once load step is finished
+            }
+        }
+    }
+
     async loadModules() {
+        await this.registerLoaders()
         // perform all steps needed to load and init modules
         await this.prebuild()
         await this.build()
