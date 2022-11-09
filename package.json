@@ -8,7 +8,8 @@
     "packages/**"
   ],
   "scripts": {
-      "cja:build": "nx run create-jahad-app:build"
+      "cja:build": "nx run create-jahad-app:build",
+      "core:build": "nx run @mr0bread/viole-core:build"
   },
   "private": true,
   "devDependencies": {

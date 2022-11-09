@@ -1,11 +1,9 @@
 import ReagentContext from "./reagent-context"
 import DependencyContainer from "./dependency-container"
-import { HookMap, IModule, PluginMap } from "./types"
-import Logger from "./logger"
+import { HookMap, IModule } from "./types"
 
 export default class ModuleLoader {
     private module: IModule
-    private pluginMap: PluginMap = {}
     private hookMap: HookMap = {
         appHooks: {
             onReady: undefined
@@ -26,63 +24,6 @@ export default class ModuleLoader {
         if (server) {
             await server(this.context.getServerInstance())
         }
-    }
-
-    private getPluginMap() {
-        const { plugins } = this.module
-
-        if (!plugins || !Object.keys(plugins).length) {
-            return {}
-        }
-
-        return plugins.reduce((acc, plugin) => {
-            const { namespace, method, type, handler } = plugin
-
-            // register first plugin for class
-            if (!acc[namespace]) {
-                acc[namespace] = {
-                    [method]: {
-                        [type]: [
-                            {
-                                handler
-                            }
-                        ]
-                    }
-                }
-
-                return acc
-            }
-
-            // register first plugin for method
-            if (!acc[namespace][method]) {
-                acc[namespace][method] = {
-                    [type]: [
-                        {
-                            handler
-                        }
-                    ]
-                }
-
-                return acc
-            }
-
-            // register first plugin of provided type
-            if (!acc[namespace][method][type]) {
-                acc[namespace][method][type] = [
-                    {
-                        handler
-                    }
-                ]
-
-                return acc
-            }
-
-            acc[namespace][method][type].push({
-                handler
-            })
-
-            return acc
-        }, {})
     }
 
     private async registerInjectables() {
@@ -245,7 +186,7 @@ export default class ModuleLoader {
         } = this.hookMap
 
         if (onReady) {
-            await onReady()
+            await onReady(this.context)
         }
     }
 }
