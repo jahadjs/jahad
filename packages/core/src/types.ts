@@ -4,7 +4,7 @@ import ReagentContext from "./reagent-context";
 import {Promisable} from "type-fest";
 
 // Using map only to ensure
-// than entity from one module
+// that entity from one module
 // can override entity from another
 export type DbEntities = {
     [p: string]: Function | string | EntitySchema
@@ -27,6 +27,12 @@ export interface PluginMap {
                 handler: Plugin["handler"]
             }[]
         }
+    }
+}
+
+export interface HookMap {
+    appHooks: {
+        onReady?: (context: ReagentContext) => Promisable<void>
     }
 }
 
@@ -55,6 +61,10 @@ export interface IModule {
             onModuleLoad?: OnModuleLoadHook[],
             onModulesLoaded?: []
         }
+        hooks?: {
+            onReady?: (context: ReagentContext) => Promisable<void>
+        }
+
     }
 }
 

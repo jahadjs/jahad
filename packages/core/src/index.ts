@@ -49,7 +49,7 @@ export const Reagent = async ({
     const moduleLoader = new ModuleLoader(loadOrder, context, moduleMap)
 
     await moduleLoader.loadModules()
-
+    await moduleLoader.ready()
     // once modules are loaded
     // it's time to create db connection
     const { db } = config

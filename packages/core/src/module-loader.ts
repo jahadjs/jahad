@@ -1,13 +1,16 @@
 import ReagentContext from "./reagent-context"
 import DependencyContainer from "./dependency-container"
-import { IModule, PluginMap } from "./types"
+import { HookMap, IModule, PluginMap } from "./types"
 import Logger from "./logger"
-
-
 
 export default class ModuleLoader {
     private module: IModule
     private pluginMap: PluginMap = {}
+    private hookMap: HookMap = {
+        appHooks: {
+            onReady: undefined
+        }
+    }
 
     constructor(
         private readonly loadOrder: string[],
@@ -198,10 +201,51 @@ export default class ModuleLoader {
         }
     }
 
+    private async registerHooks() {
+        for (const identifier of this.loadOrder) {
+            const {
+                app
+            } = this.moduleMap[identifier]
+
+            if (!app || !Object.keys(app).length) {
+                return
+            }
+
+            const {
+                hooks
+            } = app
+
+            if (!hooks || !Object.keys(hooks)) {
+                return
+            }
+
+            const {
+                onReady
+            } = hooks
+
+            if (onReady) {
+                this.hookMap.appHooks.onReady = onReady
+            }
+        }
+    }
+
     async loadModules() {
         await this.registerLoaders()
+        await this.registerHooks()
         // perform all steps needed to load and init modules
         await this.prebuild()
         await this.build()
+    }
+
+    async ready() {
+        const {
+            appHooks: {
+                onReady
+            }
+        } = this.hookMap
+
+        if (onReady) {
+            await onReady()
+        }
     }
 }
