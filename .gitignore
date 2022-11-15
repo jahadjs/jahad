@@ -3,3 +3,4 @@ dist
 playground/
 .yarn
 packages/create-jahad-app/templates
+.vscode

@@ -176,9 +176,11 @@ export default class ModuleLoader {
         // perform all steps needed to load and init modules
         await this.prebuild()
         await this.build()
+
+        await this.ready()
     }
 
-    async ready() {
+    private async ready() {
         const {
             appHooks: {
                 onReady

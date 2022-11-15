@@ -49,7 +49,7 @@ export const Reagent = async ({
     const moduleLoader = new ModuleLoader(loadOrder, context, moduleMap)
 
     await moduleLoader.loadModules()
-    await moduleLoader.ready()
+
     // once modules are loaded
     // it's time to create db connection
     const { db } = config
@@ -62,7 +62,7 @@ export const Reagent = async ({
     try {
         await dataSource.initialize()
 
-        // registerin DbConnection as injectable
+        // registering DbConnection as injectable
         DependencyContainer.addInjectable("connection", DbConnection)
 
         // Injecting connection and setting dataSource
