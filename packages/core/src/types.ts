@@ -49,7 +49,7 @@ export interface OnModulesLoadedHook {
 export interface IModule {
     identifier: string
     dependsOn?: string[]
-    server?: (fastify: ReturnType<typeof Fastify>) => void | Promise<void>
+    server?: (fastify: ReturnType<typeof Fastify>) => Promisable<void>
     injectables?: { new (): any }[]
     db?: {
         entities?: DbEntities
@@ -59,14 +59,16 @@ export interface IModule {
         context?: (context: ReagentContext) => Promisable<ReagentContext & Record<string, unknown>>
         loaders?: {
             onModuleLoad?: OnModuleLoadHook[],
-            onModulesLoaded?: []
+            onModulesLoaded?: OnModulesLoadedHook[]
         }
         hooks?: {
-            onReady?: (context: ReagentContext) => Promisable<void>
+            onReady?: (context: ReagentContext, server: ReturnType<typeof Fastify>) => Promisable<void>
         }
 
     }
 }
+
+export type ExtendedModule<T> = IModule & T
 
 export type ModuleList = IModule[]
 

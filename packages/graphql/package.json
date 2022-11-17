@@ -1,0 +1,35 @@
+{
+  "name": "@mr0bread/jahad-graphql",
+  "version": "0.0.1",
+  "description": "Jahad GraphQL module for Viole",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "ts:build": "tsc --p tsconfig.build.json",
+    "ts:types": "tsc --p tsconfig.types.json",
+    "build": "yarn ts:build && yarn ts:types",
+    "lint": "eslint"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.43.0",
+    "@typescript-eslint/parser": "^5.43.0",
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.7.1",
+    "typescript": "^4.9.3"
+  },
+  "peerDependencies": {
+    "@mr0bread/viole-core": "^0.0.1"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.1.1",
+    "@as-integrations/fastify": "^1.1.1",
+    "@graphql-tools/merge": "^8.3.12",
+    "@graphql-tools/schema": "^9.0.10",
+    "graphql": "^16.6.0"
+  }
+}
