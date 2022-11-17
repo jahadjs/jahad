@@ -188,7 +188,7 @@ export default class ModuleLoader {
         } = this.hookMap
 
         if (onReady) {
-            await onReady(this.context)
+            await onReady(this.context, this.context.getServerInstance())
         }
     }
 }

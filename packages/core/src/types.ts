@@ -30,9 +30,11 @@ export interface PluginMap {
     }
 }
 
+type OnReadyHook = (context: ReagentContext, server: ReturnType<typeof Fastify>) => Promisable<void>
+
 export interface HookMap {
     appHooks: {
-        onReady?: (context: ReagentContext) => Promisable<void>
+        onReady?: OnReadyHook
     }
 }
 
@@ -62,7 +64,7 @@ export interface IModule {
             onModulesLoaded?: OnModulesLoadedHook[]
         }
         hooks?: {
-            onReady?: (context: ReagentContext, server: ReturnType<typeof Fastify>) => Promisable<void>
+            onReady?: OnReadyHook
         }
 
     }
