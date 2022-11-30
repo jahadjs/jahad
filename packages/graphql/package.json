@@ -1,5 +1,5 @@
 {
-  "name": "@mr0bread/jahad-graphql",
+  "name": "@jahadjs/graphql",
   "version": "0.0.1",
   "description": "Jahad GraphQL module for Viole",
   "main": "dist/index.js",
@@ -23,7 +23,7 @@
     "typescript": "^4.9.3"
   },
   "peerDependencies": {
-    "@mr0bread/viole-core": "^0.0.1"
+    "@jahadjs/core": "^0.0.1"
   },
   "dependencies": {
     "@apollo/server": "^4.1.1",

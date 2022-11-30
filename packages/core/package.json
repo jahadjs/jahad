@@ -1,5 +1,5 @@
 {
-  "name": "@mr0bread/viole-core",
+  "name": "@jahadjs/core",
   "version": "0.0.7",
   "license": "MIT",
   "main": "dist/index.js",
@@ -28,7 +28,7 @@
     "type-fest": "^3.1.0",
     "vitest": "0.24.3"
   },
-  "peerDependencies": {
+  "optionalDependencies": {
     "mysql2": "^2.3.3",
     "pg": "^8.8.0",
     "sqlite3": "^5.1.2"

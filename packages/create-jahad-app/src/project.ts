@@ -37,7 +37,7 @@ const createProject = async ({
   });
 
   // install dependencies
-  const dependencies = ["@mr0bread/viole-core", "jahad"];
+  const dependencies = ["@jahadjs/core", "@jahadjs/cli"];
 
   const isYarn = packageManager === "yarn";
 

@@ -1,5 +1,5 @@
 {
-  "name": "jahad",
+  "name": "@jahadjs/cli",
   "version": "0.0.1",
   "license": "MIT",
   "type": "module",
