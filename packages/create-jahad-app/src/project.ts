@@ -37,7 +37,11 @@ const createProject = async ({
   });
 
   // install dependencies
-  const dependencies = ["@jahadjs/core", "@jahadjs/cli"];
+  const dependencies = [
+      '@jahadjs/core',
+      '@jahadjs/cli',
+      '@jahadjs/graphql'
+    ];
 
   const isYarn = packageManager === "yarn";
 

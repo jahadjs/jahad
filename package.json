@@ -9,9 +9,9 @@
   ],
   "scripts": {
       "cja:build": "nx run create-jahad-app:build",
-      "core:build": "nx run @mr0bread/viole-core:build",
-      "graphql:build": "nx run @mr0bread/jahad-graphql:build",
-      "graphql:lint": "nx run @mr0bread/jahad-graphql:lint"
+      "core:build": "nx run @jahadjs/core:build",
+      "graphql:build": "nx run @jahadjs/graphql:build",
+      "graphql:lint": "nx run @jahadjs/graphql:lint"
   },
   "private": true,
   "devDependencies": {
