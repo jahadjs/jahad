@@ -1,12 +1,20 @@
 import ReagentContext from "./reagent-context"
 import DependencyContainer from "./dependency-container"
-import { HookMap, IModule } from "./types"
+import { HookMap, ModuleHookNames, ModuleLoadHookStep, IModule } from "./types"
 
 export default class ModuleLoader {
     private module: IModule
     private hookMap: HookMap = {
         appHooks: {
-            onReady: undefined
+            onReady: [],
+            onModuleLoad: {
+                build: [],
+                prebuild: []
+            },
+            onModulesLoaded: {
+                prebuild: [],
+                build: []
+            }
         }
     }
 
@@ -93,6 +101,25 @@ export default class ModuleLoader {
         this.module = this.moduleMap[identifier]
     }
 
+    private async callModuleHooks(
+            hookName: ModuleHookNames,
+            hookType: ModuleLoadHookStep
+        ) {
+        const {
+            appHooks: {
+                [hookName]: {
+                    [hookType]: hooks
+                }
+            }
+        } = this.hookMap
+
+        if (hooks.length) {
+            for (const hook of hooks) {
+                await hook.handler(this.module, this.context)
+            }
+        }
+    }
+
     private async prebuild() {
         for (const identifier of this.loadOrder) {
             this.setNextModule(identifier)
@@ -100,7 +127,17 @@ export default class ModuleLoader {
             await this.registerInjectables()
             await this.applyContextExtensions()
             await this.registerEntities()
+
+            await this.callModuleHooks(
+                'onModuleLoad',
+                'prebuild'
+            )
         }
+
+        await this.callModuleHooks(
+            'onModulesLoaded',
+            'prebuild'
+        )
     }
 
     private async build() {
@@ -108,38 +145,17 @@ export default class ModuleLoader {
             this.setNextModule(identifier)
 
             await this.applyServerExtension()
+
+            await this.callModuleHooks(
+                'onModuleLoad',
+                'build'
+            )
         }
-    }
 
-    private async registerLoaders() {
-        for (const identifier of this.loadOrder) {
-            const {
-                app
-            } = this.moduleMap[identifier]
-
-            if (!app) {
-                return
-            }
-
-            const { loaders } = app
-
-            if (!loaders || !Object.keys(loaders).length) {
-                return;
-            }
-
-            const {
-                onModuleLoad,
-                onModulesLoaded
-            } = loaders;
-
-            if (onModuleLoad && onModuleLoad.length) {
-                // register loaders that are called after each module load
-            }
-
-            if (onModulesLoaded && onModulesLoaded.length) {
-                // register loaders that are called once load step is finished
-            }
-        }
+        await this.callModuleHooks(
+            'onModulesLoaded',
+            'build'
+        )
     }
 
     private async registerHooks() {
@@ -161,17 +177,48 @@ export default class ModuleLoader {
             }
 
             const {
-                onReady
+                onReady,
+                onModuleLoad,
+                onModulesLoaded
             } = hooks
 
-            if (onReady) {
-                this.hookMap.appHooks.onReady = onReady
+            if (onReady && onReady.length) {
+                this.hookMap.appHooks.onReady = this.hookMap.appHooks.onReady.concat(onReady)
+            }
+
+            if (onModuleLoad && onModuleLoad.length) {
+                // filter out hooks that are meant to be run during prebuild step
+                const buildHooks = onModuleLoad.filter(hook => hook.during === 'build')
+                // filter out hooks that are meant to be run during build step
+                const preBuildHooks = onModuleLoad.filter(hook => hook.during === 'prebuild')
+
+                if (buildHooks.length) {
+                    this.hookMap.appHooks.onModuleLoad.build = this.hookMap.appHooks.onModuleLoad.build.concat(buildHooks)
+                }
+
+                if (preBuildHooks.length) {
+                    this.hookMap.appHooks.onModuleLoad.prebuild = this.hookMap.appHooks.onModuleLoad.prebuild.concat(preBuildHooks)
+                }
+            }
+
+            if (onModulesLoaded && onModulesLoaded.length) {
+                // filter out hooks that are meant to be run during prebuild step
+                const buildHooks = onModulesLoaded.filter(hook => hook.after === 'build')
+                // filter out hooks that are meant to be run during build step
+                const preBuildHooks = onModulesLoaded.filter(hook => hook.after === 'prebuild')
+
+                if (buildHooks.length) {
+                    this.hookMap.appHooks.onModulesLoaded.build = this.hookMap.appHooks.onModulesLoaded.build.concat(buildHooks)
+                }
+
+                if (preBuildHooks.length) {
+                    this.hookMap.appHooks.onModulesLoaded.prebuild = this.hookMap.appHooks.onModulesLoaded.prebuild.concat(preBuildHooks)
+                }
             }
         }
     }
 
     async loadModules() {
-        await this.registerLoaders()
         await this.registerHooks()
         // perform all steps needed to load and init modules
         await this.prebuild()
@@ -187,8 +234,10 @@ export default class ModuleLoader {
             }
         } = this.hookMap
 
-        if (onReady) {
-            await onReady(this.context, this.context.getServerInstance())
+        if (onReady.length) {
+            for (const hook of onReady) {
+                await hook(this.context, this.context.getServerInstance())
+            }
         }
     }
 }

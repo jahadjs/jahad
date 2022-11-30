@@ -32,20 +32,28 @@ export interface PluginMap {
 
 type OnReadyHook = (context: ReagentContext, server: ReturnType<typeof Fastify>) => Promisable<void>
 
-export interface HookMap {
-    appHooks: {
-        onReady?: OnReadyHook
-    }
-}
+export type ModuleLoadHookStep = 'prebuild' | 'build'
 
-export interface OnModuleLoadHook {
-    during: 'pre-build' | 'build',
+export type OnModuleLoadHook = {
+    during: ModuleLoadHookStep,
     handler: (module: IModule, context: ReagentContext) => Promisable<void>
 }
 
-export interface OnModulesLoadedHook {
-    after: 'pre-build' | 'build',
-    handler: (context: ReagentContext) => Promisable<void>
+export type OnModulesLoadedHook = {
+    after: ModuleLoadHookStep,
+    handler: (module: IModule, context: ReagentContext) => Promisable<void>
+}
+
+export interface HookMap {
+    appHooks: {
+        onReady: OnReadyHook[],
+        onModuleLoad: {
+            [during in ModuleLoadHookStep]: OnModuleLoadHook[]
+        },
+        onModulesLoaded: {
+            [after in ModuleLoadHookStep]: OnModulesLoadedHook[]
+        }
+    }
 }
 
 export interface IModule {
@@ -59,16 +67,18 @@ export interface IModule {
     plugins?: Plugin[]
     app?: {
         context?: (context: ReagentContext) => Promisable<ReagentContext & Record<string, unknown>>
-        loaders?: {
+        hooks?: {
+            onReady?: OnReadyHook[],
             onModuleLoad?: OnModuleLoadHook[],
             onModulesLoaded?: OnModulesLoadedHook[]
-        }
-        hooks?: {
-            onReady?: OnReadyHook
         }
 
     }
 }
+
+export type HookNames = keyof HookMap['appHooks']
+
+export type ModuleHookNames = Exclude<HookNames, 'onReady'>
 
 export type ExtendedModule<T> = IModule & T
 

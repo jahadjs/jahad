@@ -5,8 +5,8 @@ import {
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ApolloServer, BaseContext } from "@apollo/server"
 import fastifyApollo, { fastifyApolloDrainPlugin } from "@as-integrations/fastify"
-import type ReagentContext from '@mr0bread/viole-core/src/reagent-context'
-import type { IModule } from '@mr0bread/viole-core/src/types'
+import type ReagentContext from '../../core/src/reagent-context'
+import type { IModule } from '../../core/src/types'
 
 type FirstArgument<T extends (...args: any[]) => any> = Parameters<T>[0]
 
@@ -58,11 +58,11 @@ export const GraphQLModule: IModule = {
                 resolvers: []
             }
         } as Record<string, unknown>),
-        loaders: {
+        hooks: {
             // This type of loader is called after each module is loaded
             // Which allows us to gather all passed typeDefs and resolvers
             onModuleLoad: [{
-                during: 'pre-build',
+                during: 'prebuild',
                 handler: (module, context) => {
                     const {
                         graphql
@@ -85,8 +85,8 @@ export const GraphQLModule: IModule = {
             // This type of loader is called after all modules are loaded
             // Which allows us to create a merged schema from all gathered typeDefs and resolvers
             onModulesLoaded: [{
-                after: 'pre-build',
-                handler: (context) => {
+                after: 'prebuild',
+                handler: (_, context) => {
                     const extendedContext = context as ExtendedContext
                     const {
                         graphql: {
@@ -98,31 +98,31 @@ export const GraphQLModule: IModule = {
                     // merge resolvers and typeDefs into one schema
                     extendedContext.graphql.schema = createMergedSchema(typeDefs, resolvers)
                 }
-            }]
-        },
-        hooks: {
+            }],
             // This hook is called in the very end of the app initialization
             // Which allows us to create an ApolloServer instance and register it as a Fastify plugin
-            onReady: async (context, fastify) => {
-                const {
-                    graphql: {
-                        schema
-                    }
-                } = context as ExtendedContext
-        
-                // create apollo server instance with generated schema
-                // and integrate it with Fastify instance
-                const apollo = new ApolloServer<BaseContext>({
-                    schema,
-                    plugins: [
-                        fastifyApolloDrainPlugin(fastify)
-                    ]
-                })
-        
-                await apollo.start()
-        
-                await fastify.register(fastifyApollo(apollo))
-            }
+            onReady: [
+                async (context, fastify) => {
+                    const {
+                        graphql: {
+                            schema
+                        }
+                    } = context as ExtendedContext
+            
+                    // create apollo server instance with generated schema
+                    // and integrate it with Fastify instance
+                    const apollo = new ApolloServer<BaseContext>({
+                        schema,
+                        plugins: [
+                            fastifyApolloDrainPlugin(fastify)
+                        ]
+                    })
+            
+                    await apollo.start()
+            
+                    await fastify.register(fastifyApollo(apollo))
+                }
+            ]
         }
     }
 }
