@@ -56,7 +56,7 @@ export interface HookMap {
     }
 }
 
-export interface IModule {
+export type IModule = {
     identifier: string
     dependsOn?: string[]
     server?: (fastify: ReturnType<typeof Fastify>) => Promisable<void>
@@ -72,8 +72,8 @@ export interface IModule {
             onModuleLoad?: OnModuleLoadHook[],
             onModulesLoaded?: OnModulesLoadedHook[]
         }
-
     }
+    [p: string]: unknown
 }
 
 export type HookNames = keyof HookMap['appHooks']
