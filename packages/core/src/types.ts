@@ -84,6 +84,10 @@ export type ExtendedModule<T> = IModule & T
 
 export type ModuleList = IModule[]
 
+export type CommonDbConfig = {
+    synchronize?: boolean
+}
+
 export interface Config {
     db:
         | {
@@ -93,9 +97,9 @@ export interface Config {
               username: string
               password: string
               database: string
-          }
+          } & CommonDbConfig
         | {
               type: "sqlite"
               database: string
-          }
+          } & CommonDbConfig
 }

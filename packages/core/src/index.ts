@@ -37,11 +37,12 @@ export const Reagent = async ({
     config: Config
 }) => {
     const reagentStart = process.hrtime()
+    // initialize app context
+    const context = createReagentContext()
+    
     // the same thing is being created inside of LoadOrderBuilder
     // so it has to be deduped
     const moduleMap = createModuleMap(modules)
-    // initialize app context
-    const context = createReagentContext()
 
     // build load order of modules
     const loadOrder = buildLoadOrder(modules)
@@ -93,6 +94,9 @@ export const Reagent = async ({
     )
 }
 
-export { Inject }
+export { 
+    Inject,
+    DbConnection
+ }
 
 export default Reagent
