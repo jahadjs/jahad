@@ -103,3 +103,12 @@ export interface Config {
               database: string
           } & CommonDbConfig
 }
+
+export type AppConfig = {
+    env: string,
+    debug: boolean
+}
+
+export type ModulesConfig = {
+    [key: string]: boolean
+}

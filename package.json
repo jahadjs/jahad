@@ -11,7 +11,8 @@
       "cja:build": "nx run create-jahad-app:build",
       "core:build": "nx run @jahadjs/core:build",
       "graphql:build": "nx run @jahadjs/graphql:build",
-      "graphql:lint": "nx run @jahadjs/graphql:lint"
+      "graphql:lint": "nx run @jahadjs/graphql:lint",
+      "cli:build": "nx run @jahadjs/cli:build"
   },
   "private": true,
   "devDependencies": {

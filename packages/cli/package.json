@@ -1,10 +1,12 @@
 {
   "name": "@jahadjs/cli",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "license": "MIT",
   "type": "module",
   "exports": "./dist/index.js",
-  "bin": "./dist/index.js",
+  "bin": {
+    "jahad": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsup",
     "start": "node dist/index.js"
@@ -13,9 +15,11 @@
     "chalk": "^5.1.2",
     "commander": "^9.4.1",
     "execa": "^6.1.0",
+    "fs-extra": "^11.1.0",
     "listr2": "^5.0.5"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
     "tsup": "^6.3.0",
     "typescript": "^4.8.4"
   }
