@@ -8,17 +8,20 @@
     "packages/**"
   ],
   "scripts": {
-      "cja:build": "nx run create-jahad-app:build",
-      "core:build": "nx run @jahadjs/core:build",
-      "graphql:build": "nx run @jahadjs/graphql:build",
-      "graphql:lint": "nx run @jahadjs/graphql:lint",
-      "cli:build": "nx run @jahadjs/cli:build"
+    "cja:build": "nx run create-jahad-app:build",
+    "cja:lint": "nx run create-jahad-app:lint",
+    "cja:format": "nx run create-jahad-app:format",
+    "core:build": "nx run @jahadjs/core:build",
+    "graphql:build": "nx run @jahadjs/graphql:build",
+    "graphql:lint": "nx run @jahadjs/graphql:lint",
+    "cli:build": "nx run @jahadjs/cli:build"
   },
   "private": true,
   "devDependencies": {
+    "@nrwl/eslint-plugin-nx": "15.3.3",
     "@nrwl/nx-cloud": "latest",
     "@types/inquirer": "^9.0.2",
-    "nx": "15.0.4",
-    "typescript": "^4.8.4"
+    "nx": "15.3.3",
+    "typescript": "4.9.4"
   }
 }

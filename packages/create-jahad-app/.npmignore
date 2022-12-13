@@ -1,3 +1,4 @@
 tsconfig.json
 tsup.config.ts
-src
+src/*.ts
+!src/starter

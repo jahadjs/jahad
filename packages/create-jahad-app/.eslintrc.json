@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "../../.eslintrc.json"
+  ],
+  "ignorePatterns": [
+    "!**/*",
+    "src/starter/**/*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "rules": {
+        "indent": "error",
+        "comma-dangle": ["error", "never"]
+      }
+    }
+  ]
+}

@@ -1,7 +1,0 @@
-extends:
-  - "eslint:recommends"
-  - "plugin:@typescript-eslint/recommended"
-plugins:
-  - "@typescript-eslint"
-  - "prettier"
-parser: "@typescript-eslint/parser"

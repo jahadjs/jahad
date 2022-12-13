@@ -1,5 +1,5 @@
-import path from "path"
-import { fileURLToPath } from "url"
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 // Path is in relation to a single index.js file inside ./dist
 const __filename = fileURLToPath(import.meta.url)
