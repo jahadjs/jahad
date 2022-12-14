@@ -5,6 +5,7 @@ import getUserPackageManager from 'src/get-user-package-manager.js'
 import { execaCommand } from 'execa'
 import ora from 'ora'
 import { DEPENDENCY_VERSION_MAP, STARTERS_ROOT } from './consts.js'
+import { initGit } from './git.js'
 
 const directoryStructure = {
     config: true,
@@ -107,6 +108,10 @@ const createProject = async ({
                 cwd: projectPath
             })
         }
+    }
+
+    if (isGit) {
+        await initGit(projectPath)
     }
 
     spinner.succeed()
