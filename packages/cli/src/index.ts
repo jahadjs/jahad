@@ -77,6 +77,4 @@ program
         )
     })
 
-program.help()
-
 program.parse()

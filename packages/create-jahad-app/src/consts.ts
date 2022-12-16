@@ -10,5 +10,5 @@ export const STARTERS_ROOT = path.join(PKG_SRC, 'starter')
 
 export const DEPENDENCY_VERSION_MAP = {
     '@jahadjs/core': '0.0.9',
-    '@jahadjs/cli': '0.0.4'
+    '@jahadjs/cli': '0.0.7'
 } as const
