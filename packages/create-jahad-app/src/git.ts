@@ -51,10 +51,10 @@ const getGitVersion = () => {
 
 const getDefaultBranch = () => {
     const stdout = execaCommandSync(
-        'git config --get init.defaultBranch || echo main'
+        'git config --get init.defaultBranch'
     )
         .stdout.toString()
-        .trim()
+        .trim() || 'main'
 
     return stdout
 }
@@ -141,5 +141,7 @@ export const initGit = async (projectPath: string, force: boolean) => {
         spinner.succeed(chalk.green('Successfully initialized git repository'))
     } catch (e) {
         spinner.fail(chalk.bold.red('Failed to initialize git repository'))
+
+        throw new Error(`Could not initialize git repository in ${projectPath}`);
     }
 }

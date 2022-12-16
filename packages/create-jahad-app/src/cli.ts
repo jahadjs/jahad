@@ -84,6 +84,7 @@ const runCli = async () => {
     setOptions(program)
 
     program.parse(process.argv)
+
     const {
         noGit,
         noInstall,
