@@ -1,5 +1,5 @@
 import { execaCommand, execaCommandSync } from 'execa'
-import { existsSync, remove } from 'fs-extra'
+import fs from 'fs-extra'
 import path from 'path'
 import logger from 'src/logger.js'
 import ora from 'ora'
@@ -19,7 +19,7 @@ const isGitInstalled = (dir: string) => {
 }
 
 const isRootGitRepo = (dir: string) => {
-    return existsSync(path.join(dir, '.git'))
+    return fs.existsSync(path.join(dir, '.git'))
 }
 
 const isInsideGitRepo = async (dir: string) => {
@@ -59,7 +59,27 @@ const getDefaultBranch = () => {
     return stdout
 }
 
-export const initGit = async (projectPath: string) => {
+const initGitRepo = async (projectPath: string) => {
+    const branchName = getDefaultBranch()
+
+    const { majorVersion, minorVersion } = getGitVersion()
+
+    if (majorVersion < 2 || minorVersion < 28) {
+        await execaCommand('git init', {
+            cwd: projectPath
+        })
+
+        await execaCommand(`git branch -m ${branchName}`, {
+            cwd: projectPath
+        })
+    } else {
+        await execaCommand(`git init --initial-branch=${branchName}`, {
+            cwd: projectPath
+        })
+    }
+}
+
+export const initGit = async (projectPath: string, force: boolean) => {
     if (!isGitInstalled(projectPath)) {
         logger.warn('Git is not installed. Skipping git initialization')
     }
@@ -70,7 +90,7 @@ export const initGit = async (projectPath: string) => {
     const isInside = await isInsideGitRepo(projectPath)
     const projectName = path.basename(projectPath)
 
-    if (isInside && isRoot) {
+    if (isInside && isRoot && !force) {
         // Dir is already a git repo
         spinner.stop()
 
@@ -91,10 +111,10 @@ export const initGit = async (projectPath: string) => {
             return
         }
 
-        await remove(path.join(projectPath, '.git'))
+        await fs.remove(path.join(projectPath, '.git'))
     }
 
-    if (isInside && !isRoot) {
+    if (isInside && !isRoot && !force) {
         spinner.stop()
 
         const { initChildRepo } = await inquirer.prompt<{
@@ -116,23 +136,7 @@ export const initGit = async (projectPath: string) => {
     }
 
     try {
-        const branchName = getDefaultBranch()
-
-        const { majorVersion, minorVersion } = getGitVersion()
-
-        if (majorVersion < 2 || minorVersion < 28) {
-            await execaCommand('git init', {
-                cwd: projectPath
-            })
-
-            await execaCommand(`git branch -m ${branchName}`, {
-                cwd: projectPath
-            })
-        } else {
-            await execaCommand(`git init --initial-branch=${branchName}`, {
-                cwd: projectPath
-            })
-        }
+        await initGitRepo(projectPath)
 
         spinner.succeed(chalk.green('Successfully initialized git repository'))
     } catch (e) {

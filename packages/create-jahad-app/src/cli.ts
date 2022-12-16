@@ -4,6 +4,7 @@ import inquirer from 'inquirer'
 type CliFlags = {
     noInstall: boolean
     noGit: boolean
+    default: boolean
 }
 
 const setDescription = (program: Command) => {
@@ -61,17 +62,20 @@ const setOptions = (program: Command) => {
     program
         .option('--no-install', 'Disable dependencies installation', false)
         .option('--no-git', 'Disable git initialization', false)
+        .option('-y --default', 'Use default options', false)
 }
 
 const runCli = async () => {
     const cliResults: {
         appDir: string
         isInstall: boolean,
-        isGit: boolean
+        isGit: boolean,
+        isDefault: boolean
     } = {
         appDir: '',
         isInstall: true,
-        isGit: true
+        isGit: true,
+        isDefault: false
     }
     const program = new Command('create-jahad-app')
 
@@ -82,14 +86,27 @@ const runCli = async () => {
     program.parse(process.argv)
     const {
         noGit,
-        noInstall
+        noInstall,
+        default: isDefault
     } = program.opts<CliFlags>()
 
     const appDir = program.args[0]
 
-    cliResults.appDir = appDir || (await promptAppDir())
-    cliResults.isInstall = noInstall ? false : (await promptDepsInstall())
-    cliResults.isGit = noGit ? false : (await promptGitInit())
+    if (!appDir && !isDefault) {
+        throw new Error('Please, specify your project name')
+    }
+
+    if (!isDefault) {
+        cliResults.appDir = appDir || (await promptAppDir())
+        cliResults.isInstall = noInstall ? false : (await promptDepsInstall())
+        cliResults.isGit = noGit ? false : (await promptGitInit())
+    }
+
+    if (isDefault) {
+        cliResults.appDir = appDir || 'my-jahad'
+    }
+
+    cliResults.isDefault = isDefault
 
     return cliResults
 }

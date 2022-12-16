@@ -49,11 +49,13 @@ const createStarterFiles = async (projectPath: string) => {
 const createProject = async ({
     projectName,
     isInstall = true,
-    isGit = true
+    isGit = true,
+    isDefault = false
 }: {
     projectName: string
-    isInstall?: boolean
-    isGit?: boolean
+    isInstall: boolean
+    isGit: boolean
+    isDefault: boolean
 }) => {
     const projectPath = path.resolve(process.cwd(), projectName)
 
@@ -111,7 +113,7 @@ const createProject = async ({
     }
 
     if (isGit) {
-        await initGit(projectPath)
+        await initGit(projectPath, isDefault)
     }
 
     spinner.succeed()

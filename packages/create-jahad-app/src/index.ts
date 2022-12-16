@@ -10,7 +10,8 @@ const main = async () => {
     const { 
         appDir,
         isInstall,
-        isGit
+        isGit,
+        isDefault
     } = await runCli()
     logger.info(`Creating project in dir ${appDir}`)
 
@@ -19,7 +20,8 @@ const main = async () => {
     await createProject({
         projectName: appDir,
         isInstall,
-        isGit
+        isGit,
+        isDefault
     })
 
     logger.success(`Project ${appDir} is successfully created`)
@@ -34,5 +36,5 @@ const main = async () => {
 }
 
 main().catch((e) => {
-    logger.error('Error', e)
+    logger.error(e)
 })
