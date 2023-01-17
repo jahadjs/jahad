@@ -1,0 +1,28 @@
+{
+  "name": "@jahadjs/catalog",
+  "version": "0.0.1",
+  "description": "Jahad GraphQL module",
+  "main": "dist/catalog/src/index.js",
+  "types": "dist/types/catalog/src/index.d.ts",
+  "scripts": {
+    "ts:build": "tsc --p tsconfig.build.json",
+    "ts:types": "tsc --p tsconfig.types.json",
+    "build": "yarn ts:types && yarn ts:build",
+    "lint": "eslint"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.43.0",
+    "@typescript-eslint/parser": "^5.43.0",
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.7.1",
+    "typescript": "^4.9.3"
+  },
+  "peerDependencies": {
+    "@jahadjs/core": "^0.0.7"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

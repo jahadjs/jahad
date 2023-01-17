@@ -8,6 +8,10 @@ class Logger {
     error(...text: unknown[]) {
         this.log(chalk.red(text))
     }
+
+    warn(...text: unknown[]) {
+        this.log(chalk.yellow(...text))
+    }
 }
 
 export default new Logger()

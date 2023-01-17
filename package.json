@@ -11,6 +11,7 @@
     "cja:build": "nx run create-jahad-app:build",
     "cja:lint": "nx run create-jahad-app:lint",
     "cja:format": "nx run create-jahad-app:format",
+    "cja:test": "nx run create-jahad-app:test",
     "core:build": "nx run @jahadjs/core:build",
     "graphql:build": "nx run @jahadjs/graphql:build",
     "graphql:lint": "nx run @jahadjs/graphql:lint",

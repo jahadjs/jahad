@@ -1,12 +1,13 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 import { Command } from "commander";
-import { execaCommand } from "execa";
-import logger from "src/logger.js";
+import execa from "execa";
+import logger from "./logger";
 import path from 'path'
 import fs from 'fs-extra';
-import getUserPackageManager from '../../create-jahad-app/src/get-user-package-manager.js'
+import getUserPackageManager from './utils/get-user-package-manager'
 
 const program = new Command('jahad')
+const { command: execaCommand } = execa
 
 program
     .description('CLI to manage Project Jahad applications')
@@ -15,8 +16,8 @@ program
 program
     .command('dev')
     .description('Start app in dev mode')
-    .action(() => {
-        logger.error('Not implemented')
+    .action(async () => {
+             
     })
 
 program

@@ -2,7 +2,6 @@
   "name": "@jahadjs/cli",
   "version": "0.0.7",
   "license": "MIT",
-  "type": "module",
   "exports": "./dist/index.js",
   "bin": {
     "jahad": "./dist/index.js"
@@ -12,11 +11,12 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "chalk": "^5.1.2",
+    "chalk": "4.1.2",
     "commander": "^9.4.1",
-    "execa": "^6.1.0",
+    "execa": "5.1.1",
     "fs-extra": "^11.1.0",
-    "listr2": "^5.0.5"
+    "listr2": "^5.0.5",
+    "ts-node": "^10.9.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
