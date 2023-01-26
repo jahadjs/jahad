@@ -4,6 +4,21 @@ import {
 import { readdir, statSync, existsSync } from 'fs-extra'
 import path from 'path'
 import { RESERVED_FILES } from './consts'
+import { getPathToCompiledModulesDir } from "src/utils/project";
+
+const files = [
+    RESERVED_FILES.MODULE
+] as const
+
+const fileResolvers = {
+    [RESERVED_FILES.MODULE]: {
+        fileName: RESERVED_FILES.MODULE,
+        modulePath: '',
+        async resolve() {
+            
+        }
+    }
+}
 
 export const getListOfModulesDirs = async () => {
     const modulesDirPath = getModulesDirPath()
@@ -44,12 +59,36 @@ export async function isModuleValid(modulePath: string) {
     return isValid
 }
 
-export async function getListOfModulesToLoad() {
+export async function getListOfModulesPathsToLoad() {
     const validModules = (await getListOfModulesDirs())
         .filter(
             modulePath => isModuleValid(modulePath)
         )
 
     return validModules
+}
+
+export async function compileModules() {
+    const modulesToCompile = await getListOfModulesPathsToLoad()
+
+    await Promise.all(
+        modulesToCompile
+            .map(compileModule)
+    )
+}
+
+export function createFileResolver(modulePath: string, fileName: string) {
+    const resolver = {
+        ...fileResolvers[RESERVED_FILES.MODULE],
+        modulePath
+    }
+
+    return resolver.resolve()
+}
+
+export async function compileModule(modulePath: string) {
+    await Promise.all(
+        files.map((file) => createFileResolver(modulePath, file))
+    )
 }
 
