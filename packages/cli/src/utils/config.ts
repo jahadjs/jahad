@@ -1,16 +1,14 @@
 import { AppConfig, ModulesConfig } from '../../../core/src/types.js'
 import path from 'path'
 import fs from 'fs-extra'
+import { getPathToConfigDir } from './project.js'
+import { MANDATORY_CONFIG_FILES } from './consts.js'
  
-export default async function readConfigs() {
-    const currentPath = process.cwd()
-    const configDirectory = path.join(currentPath, 'config')
-    const mandatoryConfigFiles = [
-        'app.ts',
-        'modules.ts'
-    ]
+export async function readConfigs() {
+    const configDirectory = getPathToConfigDir() 
+    
     const configFilesToTry = [
-        ...mandatoryConfigFiles
+        ...MANDATORY_CONFIG_FILES
     ]
 
     const configs = await Promise.all(
@@ -21,7 +19,7 @@ export default async function readConfigs() {
 
                 // If mandatory file is absent
                 // throw exception
-                if (mandatoryConfigFiles.includes(fileName) && !exists) {
+                if (MANDATORY_CONFIG_FILES.includes(fileName) && !exists) {
                     throw new Error(
                             `Was not able to locate mandatory configuration file ${fileName}. Checked path: ${filePath}`
                         )

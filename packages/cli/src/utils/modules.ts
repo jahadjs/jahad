@@ -1,10 +1,17 @@
 import {
-    getModulesDirPath
+    appendModuleAccumulator,
+    createModuleAccumulatorAssignment,
+    createCompiledModuleDir,
+    createImportStatement,
+    createModuleIndexFile,
+    emptyJahadDir,
+    ensureJahadDir,
+    exportModuleAccumulator,
+    getModulesDirPath, getPathToCompiledIndex, stripFileExtension, appendMainIndex, createMainIndexFile, initCoreInMainIndex
 } from './project'
-import { readdir, statSync, existsSync } from 'fs-extra'
+import { readdir, statSync, existsSync, appendFile } from 'fs-extra'
 import path from 'path'
 import { RESERVED_FILES } from './consts'
-import { getPathToCompiledModulesDir } from "src/utils/project";
 
 const files = [
     RESERVED_FILES.MODULE
@@ -14,8 +21,27 @@ const fileResolvers = {
     [RESERVED_FILES.MODULE]: {
         fileName: RESERVED_FILES.MODULE,
         modulePath: '',
+        moduleName: '',
         async resolve() {
-            
+            await appendFile(
+                getPathToCompiledIndex(this.moduleName),
+                createImportStatement(
+                    'moduleDeclaration',
+                    this.moduleName,
+                    stripFileExtension(this.fileName)
+                ),
+                {
+                    encoding: 'utf-8'
+                }
+            )
+
+            await appendFile(
+                getPathToCompiledIndex(this.moduleName),
+                createModuleAccumulatorAssignment('moduleDeclaration'),
+                {
+                    encoding: 'utf-8'
+                }
+            )
         }
     }
 }
@@ -80,15 +106,23 @@ export async function compileModules() {
 export function createFileResolver(modulePath: string, fileName: string) {
     const resolver = {
         ...fileResolvers[RESERVED_FILES.MODULE],
-        modulePath
+        modulePath,
+        moduleName: path.basename(modulePath)
     }
 
     return resolver.resolve()
 }
 
 export async function compileModule(modulePath: string) {
+    await createCompiledModuleDir(modulePath)
+    await createModuleIndexFile(modulePath)
+    await appendModuleAccumulator(modulePath)
+
     await Promise.all(
         files.map((file) => createFileResolver(modulePath, file))
     )
+
+    await exportModuleAccumulator(modulePath)
+    await appendMainIndex(modulePath)
 }
 
