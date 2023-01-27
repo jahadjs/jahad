@@ -9,5 +9,9 @@ export const MODULES_DIR = 'modules'
 
 export const MANDATORY_CONFIG_FILES = [
     'app.ts',
-    'modules.ts'
+    'modules.ts',
+    'db.ts'
+] as const
+export const CORE_CONFIG_FILES = [
+    'db.ts'
 ] as const

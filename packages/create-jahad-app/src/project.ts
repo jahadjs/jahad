@@ -4,7 +4,7 @@ import logger from 'src/logger.js'
 import getUserPackageManager from 'src/get-user-package-manager.js'
 import { execaCommand } from 'execa'
 import ora from 'ora'
-import { DEPENDENCY_VERSION_MAP, STARTERS_ROOT } from './consts.js'
+import { DEPENDENCY_VERSION_MAP, DEV_DEPENDENCY_VERSION_MAP, SCRIPTS_MAP, STARTERS_ROOT } from './consts.js'
 import { initGit } from './git.js'
 
 const directoryStructure = {
@@ -80,15 +80,9 @@ const createProject = async ({
         name: projectName,
         version: '0.1.0',
         private: true,
-        dependencies: Object.entries(DEPENDENCY_VERSION_MAP).reduce(
-            (acc, [key, value]) => {
-                return {
-                    ...acc,
-                    [key]: value
-                }
-            },
-            {}
-        )
+        scripts: SCRIPTS_MAP,
+        dependencies: DEPENDENCY_VERSION_MAP,
+        devDependencies: DEV_DEPENDENCY_VERSION_MAP
     }
 
     fs.writeJSONSync(path.join(projectPath, 'package.json'), packageJson, {

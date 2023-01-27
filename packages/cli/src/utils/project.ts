@@ -1,6 +1,7 @@
 import path from 'path'
 import { appendFile, emptyDir, ensureDir, ensureFile } from 'fs-extra'
 import { COMPILED_DIR, COMPILED_MODULES_DIR, CONFIG_DIR, MODULES_DIR } from './consts'
+import { validateConfigDir, validateConfigs } from './config'
 
 export const getProjectRootPath = () => {
     // Currently we assume that CLI is invoked at the root of project
@@ -12,7 +13,14 @@ export function getPathToConfigDir() {
         getProjectRootPath(),
         CONFIG_DIR
     )
-} 
+}
+
+export function getPathToConfig(config: string) {
+    return path.join(
+        getPathToConfigDir(),
+        config
+    )
+}
 
 export const getModulesDirPath = () => {
     const projectRoot = getProjectRootPath()
@@ -123,25 +131,34 @@ export function stripFileExtension(fileName: string) {
     return fileName.split('.')[0]
 }
 
-export async function appendMainIndex(modulePath: string) {
+export function createModuleRegistrationCode(modulePath: string) {
     const moduleName = path.basename(modulePath)
     const importStatement = `import ${ moduleName.replace('-', '_') } from "./modules/${ moduleName }"\n`
     const modulesPush = `modules.push(${ moduleName.replace('-', '_') })\n`
 
+    return importStatement + modulesPush
+}
+
+export async function appendMainIndex(content: string) {
     await appendFile(
         getPathToMainIndex(),
-        importStatement + modulesPush
+        content
     )
 }
 
 export async function initCoreInMainIndex() {
     const importStatement = 'import Reagent from "@jahadjs/core"\n'
     const coreInit = `
-    Reagent({ modules })\n
+    Reagent({ modules, config })\n
     `
 
     await appendFile(
         getPathToMainIndex(),
         importStatement + coreInit
     )
+}
+
+export async function validateProject() {
+    await validateConfigDir()
+    await validateConfigs()
 }

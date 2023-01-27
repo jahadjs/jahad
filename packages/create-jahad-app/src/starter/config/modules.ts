@@ -1,4 +1,4 @@
-import { defineModulesConfig } from '@jahadjs/core/utils'
+import { defineModulesConfig } from '@jahadjs/core'
 
 export default defineModulesConfig({
 })

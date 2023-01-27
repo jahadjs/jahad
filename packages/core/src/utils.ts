@@ -1,4 +1,4 @@
-import { AppConfig, IModule, ModuleList, ModulesConfig } from "./types"
+import { AppConfig, DbConfig, IModule, ModuleList, ModulesConfig } from "./types"
 
 export const createModuleMap = (modules: ModuleList) =>
     modules.reduce((acc, curr) => {
@@ -13,3 +13,5 @@ export const env = (key: string, fallback: string = '') => process.env[key] || f
 export const defineAppConfig = (config: AppConfig) => config
 
 export const defineModulesConfig = (config: ModulesConfig) => config
+
+export const defineDbConfig = (config: DbConfig) => config

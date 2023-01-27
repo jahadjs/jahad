@@ -2,3 +2,6 @@ tsconfig.json
 tsup.config.ts
 src/*.ts
 !src/starter
+.eslintrc.json
+.prettierignore
+.prettierrc.json

@@ -7,7 +7,7 @@ import {
     emptyJahadDir,
     ensureJahadDir,
     exportModuleAccumulator,
-    getModulesDirPath, getPathToCompiledIndex, stripFileExtension, appendMainIndex, createMainIndexFile, initCoreInMainIndex
+    getModulesDirPath, getPathToCompiledIndex, stripFileExtension, appendMainIndex, createMainIndexFile, initCoreInMainIndex, createModuleRegistrationCode
 } from './project'
 import { readdir, statSync, existsSync, appendFile } from 'fs-extra'
 import path from 'path'
@@ -123,6 +123,8 @@ export async function compileModule(modulePath: string) {
     )
 
     await exportModuleAccumulator(modulePath)
-    await appendMainIndex(modulePath)
+    await appendMainIndex(
+        createModuleRegistrationCode(modulePath)
+    )
 }
 

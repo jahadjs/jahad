@@ -97,6 +97,8 @@ export const Reagent = async ({
 export { 
     Inject,
     DbConnection
- }
+}
+
+export { defineAppConfig, defineDbConfig, defineModulesConfig, env } from './utils'
 
 export default Reagent

@@ -112,3 +112,5 @@ export type AppConfig = {
 export type ModulesConfig = {
     [key: string]: boolean
 }
+
+export type DbConfig = Config['db']

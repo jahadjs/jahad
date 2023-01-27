@@ -1,4 +1,4 @@
-import { defineAppConfig, env } from '@jahadjs/core/utils'
+import { defineAppConfig, env } from '@jahadjs/core'
 
 export default defineAppConfig({
     env: env('APP_ENV', 'production'),
